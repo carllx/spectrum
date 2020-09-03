@@ -18,6 +18,12 @@ import struct
 # 中文字体
 from matplotlib.font_manager import FontProperties
 ChineseFont = FontProperties(fname = '/Users/yamlam/Documents/GitHub/spectrum/assets/fonts/NotoSansSC-Regular.otf')
+
+
+
+
+
+
 #%%
 # CONFIG
 # wavflie = '01佛说阿弥陀经.10.wav'
@@ -61,12 +67,24 @@ plot.xlabel('Time')
 plot.ylabel('Frequency')
 plot.specgram(data,Fs=Frequency,NFFT =2048,cmap=cm.gray ) # plot.specgram(signalData[:,0],Fs=Frequency)
 
+
+
+
 plot.subplot(313)
 CHUNK = int(Frequency/20)
-f, t, Sxx = signal.spectrogram(data, fs=CHUNK)
-dBS = 10 * np.log10(Sxx)
-plot.plot(Sxx)
-# plot.pcolormesh(t, f, dBS)
+f, t, Sxx = signal.spectrogram(data)
+print('len Sxx:',len(Sxx))
+print('size Sxx:',Sxx.size)
+# # filter frequencies
+# fmin = 30# Hz
+# fmax = 40 # Hz
+# freq_slice = np.where((f >= fmin) & (f <= fmax))
+# data  = data[freq_slice]# keep only frequencies of interest
+# Sxx = Sxx[freq_slice,:][0] 
+# dBS = 10 * np.log10(Sxx)
+plot.plot(Sxx) # plot.pcolormesh(t, f, dBS)
+print('len Sxx:',len(Sxx))
+print('size Sxx:',Sxx.size)
 print(Sxx)
 plot.show()
 
