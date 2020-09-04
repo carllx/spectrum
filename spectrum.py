@@ -14,7 +14,8 @@ import numpy as np
 import matplotlib.cm as cm
 from matplotlib import gridspec
 import struct
-
+from math import sqrt
+import IPython
 # 中文字体
 from matplotlib.font_manager import FontProperties
 ChineseFont = FontProperties(fname = '/Users/yamlam/Documents/GitHub/spectrum/assets/fonts/NotoSansSC-Regular.otf')
@@ -39,55 +40,80 @@ ChineseFont = FontProperties(fname = '/Users/yamlam/Documents/GitHub/spectrum/as
 # wavflie = '大吉祥天女咒_吉祥天女咒_善女天咒_《早晚课诵集》十小咒之一_功德利益_梵文_梵音_教念_念诵_念法_佛教_歌曲_ 梵呗_梵唱_陀罗尼-5utLR2L7BK8.wav'
 # wavflie = '法鼓山早課 [大悲咒十小咒早課] (法鼓山僧團) [有字幕]-A80SNDxLXvg.wav'
 wavflie = '白財神咒（每天觀看常念咒語），可祛除貧病窮困之苦，消除罪業障礙，增上順緣，獲得受用無慮，屬無財信士起修之妙法（廣傳得福）-M2Aykg4hmJM.wav'
-start_frame = 89 # 开始时间 (单位秒 sec)
-end_frame = 95 # 结束时间 (单位秒 sec)
+start_frame = 36 # 开始时间 (单位秒 sec)
+end_frame = 54 # 结束时间 (单位秒 sec)
 channal = 0 # 声道,(0: 1声道,1 2声道)
 
 assets = 'assets/wav/'
 name = wavflie.split('.')[0]
 
 Frequency, signalData = wavfile.read(assets+wavflie)
+
+channel_count = len(signalData.shape)
+if channel_count == 2:
+    signalData = signalData.sum(axis=1) / 2 # 相当于 signalData[:,channal],通道1:channal=0,通道2:channal=1
+N = signalData.shape[0] #相当与 len(signalData)
+secs = N / float(Frequency) #Frequency:fs_rate
 total_time = int(np.floor(len(signalData)/Frequency))
-# sample_range = np.arange(31,200,1)
-# total_samples = len(sample_range)
+
 print('Frequency:',Frequency)
-print('total_time(sec):',total_time)
 print('data size:',signalData.size)
-print('data len:',len(signalData))
-data = signalData[:,channal][start_frame*Frequency:end_frame*Frequency]
+print ("channel's'count", channel_count) #2
+print ("Complete Samplings N:", N)
+print('total_time(sec):',total_time)
+print ("secs",secs)
+
+data = signalData[start_frame*Frequency:end_frame*Frequency]
+
 # show Image
-plot.subplot(311)
+plot.subplot(411)
 plot.title('Spectrogram of a wav file with '+name,fontproperties = ChineseFont)
 plot.xlabel('Sample')
 plot.ylabel('Amplitude')
 plot.plot(data)
 
-plot.subplot(312)
+plot.subplot(412)
 plot.xlabel('Time')
 plot.ylabel('Frequency')
 plot.specgram(data,Fs=Frequency,NFFT =2048,cmap=cm.gray ) # plot.specgram(signalData[:,0],Fs=Frequency)
 
-
-
-
-plot.subplot(313)
+plot.subplot(413)
 CHUNK = int(Frequency/20)
 f, t, Sxx = signal.spectrogram(data)
-print('len Sxx:',len(Sxx))
-print('size Sxx:',Sxx.size)
-# # filter frequencies
-# fmin = 30# Hz
-# fmax = 40 # Hz
-# freq_slice = np.where((f >= fmin) & (f <= fmax))
-# data  = data[freq_slice]# keep only frequencies of interest
-# Sxx = Sxx[freq_slice,:][0] 
-# dBS = 10 * np.log10(Sxx)
-plot.plot(Sxx) # plot.pcolormesh(t, f, dBS)
-print('len Sxx:',len(Sxx))
-print('size Sxx:',Sxx.size)
-print(Sxx)
+dBS = 10 * np.log10(Sxx) # 分贝（decibels/dB）
+rms = np.sqrt(sum(Sxx**2) / N) # rms voltage/power ,方均根（Root Mean Square，縮寫為 RMS(符合正态分布才有效)
+# print('rms data',rms)
+plot.plot(rms) # plot.pcolormesh(t, f, dBS),
+
+
+plot.subplot(414)
+# print('len(Sxx)[0]:',len(Sxx[0]))
+Sxx = Sxx.transpose()
+print('len(Sxx):',len(Sxx))
+print('len(rms):',len(rms))
+scaleFactor = np.interp(rms, (rms.min(), rms.max()), (1.0, 100.0))
+for idx, x in enumerate(Sxx):
+    arr = np.interp(x, (x.min(), x.max()), (-100.0, +100.0))
+    arr*= scaleFactor[idx]
+    Sxx[idx] = arr
+Sxx = Sxx.transpose()
+plot.contourf(Sxx,cmap=cm.gray)
 plot.show()
 
+# %%
+##save Image
+CM = 1/2.54  # cm in inches
+plot.figure(figsize=(70*CM,90*CM))
+plot.specgram(data,Fs=Frequency,NFFT =2048,cmap=cm.gray ) 
+plot.axis('off')
+plot.savefig(name+'.png',bbox_inches='tight', pad_inches = 0,dpi=(100))
+
+
+
+# %%
+# IPython.display.Audio(data, rate=Frequency) # load a NumPy array
+
+# %%
 # specgram 参数
 # sides ='twosided'
 # cmap=cm.twilight
@@ -103,16 +129,12 @@ plot.show()
 # t:ndarray -- Array of segment times.
 # Sxx:ndarray -- Spectrogram of x. By default, the last axis of Sxx corresponds to the segment times.
 
-# %%
-# ##save Image
-# CM = 1/2.54  # cm in inches
-# plot.figure(figsize=(7*CM,9*CM))
-# plot.specgram(signalData,Fs=samplingFrequency,cmap=cm.gray)
-# plot.axis('off')
-# plot.savefig(name+'.png',bbox_inches='tight', pad_inches = 0,dpi=(100))
 
 
 
-
-
-# %%
+# # filter frequencies
+# fmin = 30# Hz
+# fmax = 40 # Hz
+# freq_slice = np.where((f >= fmin) & (f <= fmax))
+# data  = data[freq_slice]# keep only frequencies of interest
+# Sxx = Sxx[freq_slice,:][0] 
