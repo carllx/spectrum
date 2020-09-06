@@ -10,6 +10,7 @@ from math import sqrt
 import IPython
 import pydub 
 from pydub.silence import split_on_silence
+import pandas as pd
 
 from scipy.interpolate import make_interp_spline, BSpline
 
@@ -45,18 +46,27 @@ print ("channel's'count", audio.channels) #2
 print ("Complete Samplings N:", N)
 print('len(chunks):',len(chunks))
 
-fig = plt.figure(figsize=(5,len(chunks)))
-spec = gridspec.GridSpec(ncols=1, nrows=len(chunks))
+
+RMS = []
 # # 每个音节
 for i, chunk in enumerate(chunks):
-    ax = fig.add_subplot(spec[i])
-    # ax.plot(range(5), range(5, 10)
     
     data = np.array(chunks[i].get_array_of_samples())
     f, t, Sxx = signal.spectrogram(data)
     dBS = 10 * np.log10(Sxx) 
     rms = np.sqrt(sum(Sxx**2) / N)
-    ax.plot(rms)# plot.pcolormesh(t, f, dBS),
+    RMS.append(rms)
+    print(len(RMS))
+    
+
+df = pd.DataFrame(RMS,dtype=float)
+RMS = df.fillna(0.0).values
+
+fig = plt.figure(figsize=(5,len(RMS)))
+spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
+for i, chunk in enumerate(RMS):
+    ax = fig.add_subplot(spec[i])
+    ax.plot(chunk)# plot.pcolormesh(t, f, dBS),
 
 
 
