@@ -16,6 +16,8 @@ from matplotlib import gridspec
 import struct
 from math import sqrt
 import IPython
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
 # 中文字体
 from matplotlib.font_manager import FontProperties
 ChineseFont = FontProperties(fname = '/Users/yamlam/Documents/GitHub/spectrum/assets/fonts/NotoSansSC-Regular.otf')
