@@ -15,15 +15,15 @@ import pandas as pd
 from scipy.interpolate import make_interp_spline, BSpline
 
 #%%
-wavflie = '1_如意宝轮王陀罗尼.mp3'
-start_frame = 36 # 开始时间 (单位秒 sec)
-end_frame = 54 # 结束时间 (单位秒 sec)
+# 调试一下静音参数达到最终输出 108 段音频
+wavflie = '1_般若波罗蜜多咒.mp3'
 channal = 0 # 声道,(0: 1声道,1 2声道)
+min_silence_len = 16 # interge
+silence_thresh = -15.6 # float,defult-16
+
 
 assets = 'assets/wav/'
 name = wavflie.split('.')[0]
-
-
 # Load your audio.
 # pyhub 转换scipy可用的数组  https://github.com/jiaaro/pydub/issues/424
 audio = pydub.AudioSegment.from_mp3(assets+wavflie)
@@ -35,18 +35,20 @@ N = signalData.shape[0] #相当与 len(signalData)
 
 chunks = split_on_silence (
     audio, 
-    min_silence_len = 132,
+    min_silence_len = min_silence_len,
+    silence_thresh = silence_thresh
     # keep_silence=10,
-    # silence_thresh = -16
 )
 
 print('Frequency:',Frequency)
 print('data size:',signalData.size)
 print ("channel's'count", audio.channels) #2
 print ("Complete Samplings N:", N)
-print('len(chunks):',len(chunks))
+print('len(chunks):',len(chunks))# 调试至 108 
 
-
+#%%
+# 产生RMS:首位填充0 的相当len 的 array
+# ---------
 RMS = []
 # # 每个音节
 for i, chunk in enumerate(chunks):
@@ -56,12 +58,18 @@ for i, chunk in enumerate(chunks):
     dBS = 10 * np.log10(Sxx) 
     rms = np.sqrt(sum(Sxx**2) / N)
     RMS.append(rms)
-    print(len(RMS))
-    
+    # print(len(RMS)) 
 
 df = pd.DataFrame(RMS,dtype=float)
-RMS = df.fillna(0.0).values
+# RMS = df.fillna(method="bfill").values # 拉伸填充
+df.insert(0,"0",np.zeros(108)) #第一列填充0
+RMS = df.fillna(value=0.0).values
+print('每row 的个数:1-',len(RMS[0]))
 
+
+#%%
+# 输出图形 108张截面 plot
+# ---------
 fig = plt.figure(figsize=(5,len(RMS)))
 spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
 for i, chunk in enumerate(RMS):
@@ -70,7 +78,9 @@ for i, chunk in enumerate(RMS):
 
 
 
-
+#%%
+# specgram
+# ---------
 # plot.specgram(samples,Fs=Frequency,NFFT =2048,cmap=cm.gray ) 
 # f, t, Sxx = signal.spectrogram(samples)
 # # samples = chunks[0].get_array_of_samples()
