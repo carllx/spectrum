@@ -16,14 +16,23 @@ from scipy.interpolate import make_interp_spline, BSpline
 
 #%%
 # 调试一下静音参数达到最终输出 108 段音频
+# wavflie = '1_般若波罗蜜多咒.mp3'
+# channal = 0 # 声道,(0: 1声道,1 2声道)
+# min_silence_len = 16 # interge
+# silence_thresh = -15.6 # float,defult-16
+
+
 wavflie = '1_般若波罗蜜多咒.mp3'
 channal = 0 # 声道,(0: 1声道,1 2声道)
-min_silence_len = 16 # interge
-silence_thresh = -15.6 # float,defult-16
+min_silence_len = 98 # interge
+silence_thresh = -16 # float,defult-16
+
+
 
 
 assets = 'assets/wav/'
 name = wavflie.split('.')[0]
+
 # Load your audio.
 # pyhub 转换scipy可用的数组  https://github.com/jiaaro/pydub/issues/424
 audio = pydub.AudioSegment.from_mp3(assets+wavflie)
@@ -36,50 +45,79 @@ N = signalData.shape[0] #相当与 len(signalData)
 chunks = split_on_silence (
     audio, 
     min_silence_len = min_silence_len,
-    silence_thresh = silence_thresh
+    # silence_thresh = silence_thresh
     # keep_silence=10,
 )
+len_rows = len(chunks)
 
 print('Frequency:',Frequency)
 print('data size:',signalData.size)
 print ("channel's'count", audio.channels) #2
 print ("Complete Samplings N:", N)
-print('len(chunks):',len(chunks))# 调试至 108 
+print('len(chunks):',len_rows)# 调试至 108 
 
-#%%
+
 # 产生RMS:首位填充0 的相当len 的 array
 # ---------
 RMS = []
+
 # # 每个音节
 for i, chunk in enumerate(chunks):
-    
     data = np.array(chunks[i].get_array_of_samples())
     f, t, Sxx = signal.spectrogram(data)
     dBS = 10 * np.log10(Sxx) 
     rms = np.sqrt(sum(Sxx**2) / N)
     RMS.append(rms)
+    
     # print(len(RMS)) 
 
+# 将不等的多位数组,规范居中的 dataframe
+
+def get_df_alignCenter_from_mlist(array):
+    # print (type(array)) #<class 'list'>
+    signalsPointss = []
+    for x in array:
+        signalsPointss.append(len(x)) # 一行rms信号点个数
+    
+    len_array = max(signalsPointss) # 将会产生df 的 cols数
+    for i, arr in enumerate(array):
+        len_arr = len(arr)
+        len_fill = round((len_array - len_arr)/2)
+        zeroarr = [0] * len_fill
+        arr= np.append(zeroarr,arr)
+        arr= np.append(arr,zeroarr)
+        
+        array[i] = arr
+    # 头尾静音数组
+    zeros = np.zeros(len_array) 
+    # print (type(zeros)) # <class 'numpy.ndarray'>
+    # print (type(array)) # <class 'list'>
+    # print (type(array[0])) # <class 'numpy.ndarray'>
+    array.insert(0,zeros)
+    array.insert(len(array),zeros)
+    return array
+RMS = get_df_alignCenter_from_mlist(RMS)
 df = pd.DataFrame(RMS,dtype=float)
+
+# 非居中可使用更简单高效方式
+# df = pd.DataFrame(RMS,dtype=float)
 # RMS = df.fillna(method="bfill").values # 拉伸填充
 
-df = (df-df.min())/(df.max()-df.min()) #[Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
-df.insert(0,"0",np.zeros(108)) #第一列填充0
+df = (df-df.min())/(df.max()-df.min()) # 将dataframe 内values 规范在指定范围内,[Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
+df.insert(0,"0",np.zeros(len(df))) #第一列填充0
 df = df.fillna(value=0.0)
 RMS = df.values
-# RMS = df.fillna(value=0.0).values
-# print('每row 的个数:1-',len(RMS[0]))
-print('number of rows: 1 ~',len(df))
-print('number of columns:1 ~',len(df.columns))
+print('number of rows: 1 ~',len(df)-2)
+print('number of cols: 1 ~',len(df.columns)-2)
 
 
 
 #%%
 # 输出Json
 #--------------
-result = df.to_json(r'%s.json'%name,orient="values")
+result = df.to_json(outTXT,orient="values")
 # parsed = json.loads(result)
-
+outTXT = r'%s_split%d.txt'%(name,len_rows)
 
 #%%
 # 输出图形 108张截面 plot
@@ -88,7 +126,7 @@ fig = plt.figure(figsize=(5,len(RMS)))
 spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
 for i, chunk in enumerate(RMS):
     ax = fig.add_subplot(spec[i])
-    ax.plot(chunk)# plot.pcolormesh(t, f, dBS),
+    ax.plot(chunk) # plot.pcolormesh(t, f, dBS),
 
 
 #%%
