@@ -11,7 +11,7 @@ import IPython
 import pydub 
 from pydub.silence import split_on_silence
 import pandas as pd
-
+import json
 from scipy.interpolate import make_interp_spline, BSpline
 
 #%%
@@ -62,9 +62,23 @@ for i, chunk in enumerate(chunks):
 
 df = pd.DataFrame(RMS,dtype=float)
 # RMS = df.fillna(method="bfill").values # 拉伸填充
+
+df = (df-df.min())/(df.max()-df.min()) #[Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
 df.insert(0,"0",np.zeros(108)) #第一列填充0
-RMS = df.fillna(value=0.0).values
-print('每row 的个数:1-',len(RMS[0]))
+df = df.fillna(value=0.0)
+RMS = df.values
+# RMS = df.fillna(value=0.0).values
+# print('每row 的个数:1-',len(RMS[0]))
+print('number of rows: 1 ~',len(df))
+print('number of columns:1 ~',len(df.columns))
+
+
+
+#%%
+# 输出Json
+#--------------
+result = df.to_json(r'%s.json'%name,orient="values")
+# parsed = json.loads(result)
 
 
 #%%
@@ -75,7 +89,6 @@ spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
 for i, chunk in enumerate(RMS):
     ax = fig.add_subplot(spec[i])
     ax.plot(chunk)# plot.pcolormesh(t, f, dBS),
-
 
 
 #%%
