@@ -14,24 +14,43 @@ import pandas as pd
 import json
 from scipy.interpolate import make_interp_spline, BSpline
 
+#%% [markdown]
+# ## 调试配置参数
+
+
 #%%
-# 调试一下静音参数达到最终输出 108 段音频
+# 调试一下静音参数达到最终输出音频段数 例如:108 段音频
 # wavflie = '1_般若波罗蜜多咒.mp3'
 # channal = 0 # 声道,(0: 1声道,1 2声道)
 # min_silence_len = 16 # interge
 # silence_thresh = -15.6 # float,defult-16
 
+# wavflie = '1_般若波罗蜜多咒.mp3'
+# channal = 0 # 声道,(0: 1声道,1 2声道)
+# min_silence_len = 98 # interge
+# silence_thresh = -16 # float,defult-16
 
-wavflie = '1_般若波罗蜜多咒.mp3'
+# wavflie = '1、如意宝轮王陀罗尼.mp3'
+# channal = 0 # 声道,(0: 1声道,1 2声道)
+# min_silence_len = 110 # interge
+# silence_thresh = -16 # float,defult-16
+
+# wavflie = '2、消灾吉祥神咒.mp3'
+# channal = 0 # 声道,(0: 1声道,1 2声道)
+# min_silence_len = 97 # interge
+# silence_thresh = -16 # float,defult-16
+
+wavflie = '3、功德宝山神咒.mp3'
 channal = 0 # 声道,(0: 1声道,1 2声道)
-min_silence_len = 98 # interge
+min_silence_len = 79 # interge
 silence_thresh = -16 # float,defult-16
 
 
 
-
-assets = 'assets/wav/'
+# 预设参数
 name = wavflie.split('.')[0]
+assets = 'assets/wav/'
+exports = 'exports/'
 
 # Load your audio.
 # pyhub 转换scipy可用的数组  https://github.com/jiaaro/pydub/issues/424
@@ -45,7 +64,7 @@ N = signalData.shape[0] #相当与 len(signalData)
 chunks = split_on_silence (
     audio, 
     min_silence_len = min_silence_len,
-    # silence_thresh = silence_thresh
+    silence_thresh = silence_thresh
     # keep_silence=10,
 )
 len_rows = len(chunks)
@@ -113,14 +132,14 @@ print('number of cols: 1 ~',len(df.columns)-2)
 
 
 #%%
-# 输出Json
+# Export Json
 #--------------
+outTXT = r'%s%s_splitRows%d.json'%(exports,name,len_rows)
 result = df.to_json(outTXT,orient="values")
 # parsed = json.loads(result)
-outTXT = r'%s_split%d.txt'%(name,len_rows)
 
 #%%
-# 输出图形 108张截面 plot
+# Show图形 108张截面 plot
 # ---------
 fig = plt.figure(figsize=(5,len(RMS)))
 spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
