@@ -1,0 +1,391 @@
+{
+  "export_version": "0.079",
+  "framed_nodes": {},
+  "groups": {},
+  "nodes": {
+    "Bisect": {
+      "bl_idname": "SvBisectNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -120.59793090820312,
+        216.75828552246094
+      ],
+      "params": {
+        "fill": 1,
+        "inner": 1,
+        "outer": 1,
+        "slice_mode": 0
+      },
+      "width": 148.91348266601562
+    },
+    "Extrude Separate Faces": {
+      "bl_idname": "SvExtrudeSeparateNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        590.7719116210938,
+        83.62003326416016
+      ],
+      "mask_out_type": [
+        "mask"
+      ],
+      "params": {
+        "height_": -0.019999999552965164,
+        "scale_": 1.0
+      },
+      "width": 240.854248046875
+    },
+    "Line": {
+      "bl_idname": "SvLineNodeMK4",
+      "color": [
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -697.7177124023438,
+        -142.07012939453125
+      ],
+      "params": {
+        "center": 1,
+        "direction": "X",
+        "length_mode": "Size",
+        "num": 8,
+        "size": 0.8999999761581421
+      },
+      "use_custom_color": true,
+      "width": 140.0
+    },
+    "Line.001": {
+      "bl_idname": "SvLineNodeMK4",
+      "color": [
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -691.3309326171875,
+        -593.5812377929688
+      ],
+      "params": {
+        "center": 1,
+        "direction": "Y",
+        "length_mode": "Size",
+        "num": 108,
+        "size": 0.6700000166893005
+      },
+      "use_custom_color": true,
+      "width": 140.0
+    },
+    "Matrix Euler": {
+      "bl_idname": "SvMatrixEulerNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -713.006103515625,
+        -371.9598083496094
+      ],
+      "params": {
+        "X": 0.0,
+        "Y": 90.0,
+        "Z": 0.0
+      },
+      "width": 140.0
+    },
+    "Matrix Euler.001": {
+      "bl_idname": "SvMatrixEulerNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -709.464111328125,
+        -825.3681640625
+      ],
+      "params": {
+        "X": 90.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "width": 140.0
+    },
+    "Matrix In.001": {
+      "bl_idname": "SvMatrixInNodeMK4",
+      "custom_socket_props": {
+        "0": {
+          "expanded": true
+        },
+        "1": {
+          "expanded": true
+        }
+      },
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -362.9964294433594,
+        -240.129150390625
+      ],
+      "params": {
+        "location_": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.37000003457069397,
+          0.7899999618530273,
+          1.1499998569488525
+        ]
+      },
+      "width": 140.0
+    },
+    "Matrix In.002": {
+      "bl_idname": "SvMatrixInNodeMK4",
+      "custom_socket_props": {
+        "0": {
+          "expanded": true
+        },
+        "1": {
+          "expanded": true
+        }
+      },
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -320.5307312011719,
+        -651.0589599609375
+      ],
+      "params": {
+        "location_": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.1499998569488525,
+          0.4300001561641693,
+          1.8299999237060547
+        ]
+      },
+      "width": 140.0
+    },
+    "Matrix out": {
+      "bl_idname": "MatrixOutNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -542.103759765625,
+        -371.34088134765625
+      ],
+      "params": {},
+      "width": 140.0
+    },
+    "Matrix out.001": {
+      "bl_idname": "MatrixOutNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -538.561767578125,
+        -824.7492065429688
+      ],
+      "params": {},
+      "width": 140.0
+    },
+    "Mesh Join": {
+      "bl_idname": "SvMeshJoinNode",
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        193.4950408935547,
+        233.4654998779297
+      ],
+      "params": {},
+      "width": 140.0
+    },
+    "Objects in": {
+      "bl_idname": "SvObjectsNodeMK3",
+      "color": [
+        0.0,
+        0.5,
+        0.20000000298023224
+      ],
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        -357.86627197265625,
+        211.1448211669922
+      ],
+      "object_names": [
+        "Sv_0"
+      ],
+      "params": {
+        "is_animatable": 1,
+        "modifiers": 0,
+        "refresh": 0,
+        "sort": 1,
+        "vergroups": 0
+      },
+      "use_custom_color": true,
+      "width": 190.28759765625
+    },
+    "Viewer Draw Mk3": {
+      "bl_idname": "SvVDExperimental",
+      "color": [
+        1.0,
+        0.5889999866485596,
+        0.21400000154972076
+      ],
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        779.71435546875,
+        335.8963623046875
+      ],
+      "params": {
+        "activate": 0,
+        "display_edges": 1,
+        "display_faces": 1,
+        "display_verts": 0,
+        "selected_draw_mode": "flat"
+      },
+      "use_custom_color": true,
+      "width": 282.30224609375
+    },
+    "Viewer Draw Mk3.001": {
+      "bl_idname": "SvVDExperimental",
+      "color": [
+        1.0,
+        0.5889999866485596,
+        0.21400000154972076
+      ],
+      "height": 100.0,
+      "hide": false,
+      "label": "",
+      "location": [
+        423.6851806640625,
+        -539.364013671875
+      ],
+      "params": {
+        "activate": 0,
+        "display_verts": 1,
+        "selected_draw_mode": "flat"
+      },
+      "use_custom_color": true,
+      "width": 140.0
+    }
+  },
+  "update_lists": [
+    [
+      "Matrix Euler.001",
+      0,
+      "Matrix out.001",
+      0
+    ],
+    [
+      "Line.001",
+      0,
+      "Matrix In.002",
+      0
+    ],
+    [
+      "Matrix out.001",
+      2,
+      "Matrix In.002",
+      6
+    ],
+    [
+      "Matrix out.001",
+      3,
+      "Matrix In.002",
+      7
+    ],
+    [
+      "Objects in",
+      0,
+      "Bisect",
+      0
+    ],
+    [
+      "Objects in",
+      2,
+      "Bisect",
+      1
+    ],
+    [
+      "Matrix In.002",
+      0,
+      "Bisect",
+      2
+    ],
+    [
+      "Matrix In.002",
+      0,
+      "Viewer Draw Mk3.001",
+      3
+    ],
+    [
+      "Bisect",
+      0,
+      "Mesh Join",
+      0
+    ],
+    [
+      "Bisect",
+      2,
+      "Mesh Join",
+      1
+    ],
+    [
+      "Mesh Join",
+      0,
+      "Viewer Draw Mk3",
+      0
+    ],
+    [
+      "Mesh Join",
+      1,
+      "Viewer Draw Mk3",
+      2
+    ],
+    [
+      "Matrix Euler",
+      0,
+      "Matrix out",
+      0
+    ],
+    [
+      "Line",
+      0,
+      "Matrix In.001",
+      0
+    ],
+    [
+      "Matrix out",
+      2,
+      "Matrix In.001",
+      6
+    ],
+    [
+      "Matrix out",
+      3,
+      "Matrix In.001",
+      7
+    ]
+  ]
+}

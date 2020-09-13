@@ -9,7 +9,7 @@ import struct
 from math import sqrt
 import IPython
 import pydub 
-from pydub.silence import split_on_silence
+# from pydub.silence import split_on_silence
 import pandas as pd
 import json
 from scipy.interpolate import make_interp_spline, BSpline
@@ -20,30 +20,18 @@ from scipy.interpolate import make_interp_spline, BSpline
 
 #%%
 # 调试一下静音参数达到最终输出音频段数 例如:108 段音频
-# wavflie = '1_般若波罗蜜多咒.mp3'
-# channal = 0 # 声道,(0: 1声道,1 2声道)
-# min_silence_len = 16 # interge
-# silence_thresh = -15.6 # float,defult-16
 
-# wavflie = '1_般若波罗蜜多咒.mp3'
-# channal = 0 # 声道,(0: 1声道,1 2声道)
-# min_silence_len = 98 # interge
-# silence_thresh = -16 # float,defult-16
+# wavflie = '1_般若波罗蜜多咒.mp3' #38句
+# min_silence_len = 640 # interge 
 
-# wavflie = '1、如意宝轮王陀罗尼.mp3'
-# channal = 0 # 声道,(0: 1声道,1 2声道)
-# min_silence_len = 110 # interge
-# silence_thresh = -16 # float,defult-16
+wavflie = '1、如意宝轮王陀罗尼.mp3' #10句
+min_silence_len = 640 # interge
 
-# wavflie = '2、消灾吉祥神咒.mp3'
-# channal = 0 # 声道,(0: 1声道,1 2声道)
-# min_silence_len = 97 # interge
-# silence_thresh = -16 # float,defult-16
+# wavflie = '2、消灾吉祥神咒.mp3' #7段
+# min_silence_len = 640 # interge
 
-wavflie = '3、功德宝山神咒.mp3'
-channal = 0 # 声道,(0: 1声道,1 2声道)
-min_silence_len = 79 # interge
-silence_thresh = -16 # float,defult-16
+# wavflie = '3、功德宝山神咒.mp3'
+# min_silence_len = 79 # interge
 
 
 
@@ -60,23 +48,35 @@ if audio.channels == 2:
     signalData = signalData.reshape((-1, 2))  #if normalized:#return a.frame_rate, np.float32(y) / 2**15
 Frequency =  audio.frame_rate
 N = signalData.shape[0] #相当与 len(signalData)
-
-chunks = split_on_silence (
-    audio, 
-    min_silence_len = min_silence_len,
-    silence_thresh = silence_thresh
-    # keep_silence=10,
-)
-len_rows = len(chunks)
-
+print('dBFS:',audio.dBFS)
 print('Frequency:',Frequency)
 print('data size:',signalData.size)
 print ("channel's'count", audio.channels) #2
 print ("Complete Samplings N:", N)
+# dBS = 10 * np.log10(Sxx) 
+    # print(dBS)
+
+ # 分割静音 
+ #pydub.silence.detect_silence(
+chunks =  pydub.silence.split_on_silence(
+    audio, 
+    # silence_thresh = audio.dBFS # float,defult-16
+    # min_silence_len = min_silence_len,
+    min_silence_len = 500,
+    silence_thresh =-999, 
+    
+    # keep_silence=10,
+)
+len_rows = len(chunks)
+chunks[0].export('split-.mp3', format='mp3',codec='mp3')
+# for i, chunk in enumerate(chunks):
+#     chunk.export('split-%d.mp3'%(i+1), format='mp3',codec='mp3')
+
+
 print('len(chunks):',len_rows)# 调试至 108 
 
 
-# 产生RMS:首位填充0 的相当len 的 array
+# 产生RMS: 每句话一行(sentence/rows)的array(首位填充0)
 # ---------
 RMS = []
 
@@ -84,7 +84,6 @@ RMS = []
 for i, chunk in enumerate(chunks):
     data = np.array(chunks[i].get_array_of_samples())
     f, t, Sxx = signal.spectrogram(data)
-    dBS = 10 * np.log10(Sxx) 
     rms = np.sqrt(sum(Sxx**2) / N)
     RMS.append(rms)
     
@@ -94,11 +93,11 @@ for i, chunk in enumerate(chunks):
 
 def get_df_alignCenter_from_mlist(array):
     # print (type(array)) #<class 'list'>
-    signalsPointss = []
+    signalsPoints = []
     for x in array:
-        signalsPointss.append(len(x)) # 一行rms信号点个数
+        signalsPoints.append(len(x)) # 一行rms信号点个数
     
-    len_array = max(signalsPointss) # 将会产生df 的 cols数
+    len_array = max(signalsPoints) # 将会产生df 的 cols数
     for i, arr in enumerate(array):
         len_arr = len(arr)
         len_fill = round((len_array - len_arr)/2)
@@ -121,8 +120,8 @@ df = pd.DataFrame(RMS,dtype=float)
 # 非居中可使用更简单高效方式
 # df = pd.DataFrame(RMS,dtype=float)
 # RMS = df.fillna(method="bfill").values # 拉伸填充
-
-df = (df-df.min())/(df.max()-df.min()) # 将dataframe 内values 规范在指定范围内,[Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
+# 将dataframe 内values 规范在指定范围内,
+# df = (df-df.min())/(df.max()-df.min()) # 某些峰位会被截掉 [Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
 df.insert(0,"0",np.zeros(len(df))) #第一列填充0
 df = df.fillna(value=0.0)
 RMS = df.values

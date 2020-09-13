@@ -7,7 +7,8 @@ out flatten_data s
 """
 
 #### This expects an input mesh that represents an edgenet without junctions and unlooped.
-import numpy as np 
+import numpy as np
+import json
 
 rows =len(data)
 cols =len(data[0])
