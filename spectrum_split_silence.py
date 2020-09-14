@@ -13,6 +13,8 @@ import pydub
 import pandas as pd
 import json
 from scipy.interpolate import make_interp_spline, BSpline
+from scipy.ndimage.filters import gaussian_filter
+
 
 #%% [markdown]
 # ## 调试配置参数
@@ -21,11 +23,11 @@ from scipy.interpolate import make_interp_spline, BSpline
 #%%
 # 调试一下静音参数达到最终输出音频段数 例如:108 段音频
 
-# wavflie = '1_般若波罗蜜多咒.mp3' #38句
-# min_silence_len = 640 # interge 
+wavflie = '1_般若波罗蜜多咒.mp3' #38句 
+min_silence_len = 640 # interge 
 
-wavflie = '1、如意宝轮王陀罗尼.mp3' #10句
-min_silence_len = 640 # interge
+# wavflie = '1、如意宝轮王陀罗尼.mp3' #10句 #sigma=3
+# min_silence_len = 640 # interge
 
 # wavflie = '2、消灾吉祥神咒.mp3' #7段
 # min_silence_len = 640 # interge
@@ -85,6 +87,7 @@ for i, chunk in enumerate(chunks):
     data = np.array(chunks[i].get_array_of_samples())
     f, t, Sxx = signal.spectrogram(data)
     rms = np.sqrt(sum(Sxx**2) / N)
+    # rms = gaussian_filter(rms, sigma=20) # 高斯模糊
     RMS.append(rms)
     
     # print(len(RMS)) 
@@ -97,45 +100,48 @@ def get_df_alignCenter_from_mlist(array):
     for x in array:
         signalsPoints.append(len(x)) # 一行rms信号点个数
     
-    len_array = max(signalsPoints) # 将会产生df 的 cols数
-    for i, arr in enumerate(array):
-        len_arr = len(arr)
-        len_fill = round((len_array - len_arr)/2)
+    len_cols = max(signalsPoints) #df 的 cols数
+    for i, row in enumerate(array):
+        len_arr = len(row)
+        len_fill = round((len_cols - len_arr)/2)
         zeroarr = [0] * len_fill
-        arr= np.append(zeroarr,arr)
-        arr= np.append(arr,zeroarr)
-        
-        array[i] = arr
-    # 头尾静音数组
-    zeros = np.zeros(len_array) 
-    # print (type(zeros)) # <class 'numpy.ndarray'>
-    # print (type(array)) # <class 'list'>
-    # print (type(array[0])) # <class 'numpy.ndarray'>
-    array.insert(0,zeros)
-    array.insert(len(array),zeros)
-    return array
+        row= np.append(zeroarr,row)
+        row= np.append(row,zeroarr)
+        array[i] = row
+    return array # <class 'list'>,array[0] # <class 'numpy.ndarray'>
+
+
 RMS = get_df_alignCenter_from_mlist(RMS)
-df = pd.DataFrame(RMS,dtype=float)
+# 每rows头尾插入静音数组
+RMS_0 = RMS.copy()
+len_cols = len(RMS_0[0])
+zeros = np.zeros(len_cols) # <class 'numpy.ndarray'>
+
+for x in range(len(RMS_0)):
+    RMS_0.insert(2*x+1, zeros)
+RMS_0.insert(0,zeros)
+
+
+# 增加一行0
+
+
+df = pd.DataFrame(RMS_0,dtype=float)
 
 # 非居中可使用更简单高效方式
 # df = pd.DataFrame(RMS,dtype=float)
 # RMS = df.fillna(method="bfill").values # 拉伸填充
 # 将dataframe 内values 规范在指定范围内,
 # df = (df-df.min())/(df.max()-df.min()) # 某些峰位会被截掉 [Normalization vs Standardization, which one is better](https://towardsdatascience.com/normalization-vs-standardization-which-one-is-better-f29e043a57eb)
-df.insert(0,"0",np.zeros(len(df))) #第一列填充0
+# df.insert(0,"0",np.zeros(len(df))) #第一列填充0
 df = df.fillna(value=0.0)
-RMS = df.values
+RMSG = df.values
+RMSG = gaussian_filter(RMSG, sigma=4)
 print('number of rows: 1 ~',len(df)-2)
 print('number of cols: 1 ~',len(df.columns)-2)
 
 
 
-#%%
-# Export Json
-#--------------
-outTXT = r'%s%s_splitRows%d.json'%(exports,name,len_rows)
-result = df.to_json(outTXT,orient="values")
-# parsed = json.loads(result)
+
 
 #%%
 # Show图形 108张截面 plot
@@ -146,6 +152,14 @@ for i, chunk in enumerate(RMS):
     ax = fig.add_subplot(spec[i])
     ax.plot(chunk) # plot.pcolormesh(t, f, dBS),
 
+
+#%%
+# Export Json
+#--------------——
+df = pd.DataFrame(data=RMSG)
+outTXT = r'%s%s_splitRows%d.json'%(exports,name,len_rows)
+result = df.to_json(outTXT,orient="values")
+# parsed = json.loads(result)
 
 #%%
 # specgram
