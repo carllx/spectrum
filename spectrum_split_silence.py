@@ -23,14 +23,40 @@ from scipy.ndimage.filters import gaussian_filter
 #%%
 # 调试一下静音参数达到最终输出音频段数 例如:108 段音频
 
-wavflie = '1_般若波罗蜜多咒.mp3' #38句 
-min_silence_len = 640 # interge 
+# wavflie = '1_般若波罗蜜多咒.mp3' #38句 
+# min_silence_len = 640 # interge 
+# sigma = 4
 
-# wavflie = '1、如意宝轮王陀罗尼.mp3' #10句 #sigma=3
+# wavflie = '1、如意宝轮王陀罗尼.mp3' #10句 
 # min_silence_len = 640 # interge
+# sigma= 3
 
-# wavflie = '2、消灾吉祥神咒.mp3' #7段
+
+# wavflie = '3_大悲咒.mp3' #85句 
 # min_silence_len = 640 # interge
+# sigma= 3
+
+# wavflie = '2_雨宝咒.mp3' #60句 
+# min_silence_len = 640 # interge
+# sigma= 4
+
+
+# wavflie = '4_清心普善咒.mp3' #129句 
+# min_silence_len = 640 # interge
+# sigma= 3
+
+# wavflie = '5_佛顶尊胜陀罗尼咒.mp3' #35句 
+# min_silence_len = 640 # interge
+# sigma= 4
+
+# wavflie = '6_宝箧印陀罗尼咒注音.mp3' #38句 
+# min_silence_len = 640 # interge
+# sigma= 4.5
+
+
+wavflie = '2、消灾吉祥神咒.mp3' #7段 # 一个区域太高
+min_silence_len = 640 # interge
+sigma= 5
 
 # wavflie = '3、功德宝山神咒.mp3'
 # min_silence_len = 79 # interge
@@ -110,7 +136,6 @@ def get_df_alignCenter_from_mlist(array):
         array[i] = row
     return array # <class 'list'>,array[0] # <class 'numpy.ndarray'>
 
-
 RMS = get_df_alignCenter_from_mlist(RMS)
 # 每rows头尾插入静音数组
 RMS_0 = RMS.copy()
@@ -122,11 +147,9 @@ for x in range(len(RMS_0)):
 RMS_0.insert(0,zeros)
 
 
-# 增加一行0
-
-
+# Gaussian blur DataFrame
+#------------------------------
 df = pd.DataFrame(RMS_0,dtype=float)
-
 # 非居中可使用更简单高效方式
 # df = pd.DataFrame(RMS,dtype=float)
 # RMS = df.fillna(method="bfill").values # 拉伸填充
@@ -135,12 +158,19 @@ df = pd.DataFrame(RMS_0,dtype=float)
 # df.insert(0,"0",np.zeros(len(df))) #第一列填充0
 df = df.fillna(value=0.0)
 RMSG = df.values
-RMSG = gaussian_filter(RMSG, sigma=4)
+RMSG = gaussian_filter(RMSG, sigma=sigma)
 print('number of rows: 1 ~',len(df)-2)
 print('number of cols: 1 ~',len(df.columns)-2)
 
 
 
+# Export Json
+#--------------——
+df = pd.DataFrame(data=RMSG)
+outTXT = r'%s%s_splitRows%d.json'%(exports,name,len_rows)
+result = df.to_json(outTXT,orient="values")
+print(outTXT,'is outputed')
+# parsed = json.loads(result)
 
 
 #%%
@@ -151,15 +181,6 @@ spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
 for i, chunk in enumerate(RMS):
     ax = fig.add_subplot(spec[i])
     ax.plot(chunk) # plot.pcolormesh(t, f, dBS),
-
-
-#%%
-# Export Json
-#--------------——
-df = pd.DataFrame(data=RMSG)
-outTXT = r'%s%s_splitRows%d.json'%(exports,name,len_rows)
-result = df.to_json(outTXT,orient="values")
-# parsed = json.loads(result)
 
 #%%
 # specgram
