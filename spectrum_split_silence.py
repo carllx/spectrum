@@ -147,7 +147,7 @@ for x in range(len(RMS_0)):
 RMS_0.insert(0,zeros)
 
 
-# Gaussian blur DataFrame
+# Gaussian blur DataFrame ,gauss-filter (blur) a floating point numpy array
 #------------------------------
 df = pd.DataFrame(RMS_0,dtype=float)
 # 非居中可使用更简单高效方式
