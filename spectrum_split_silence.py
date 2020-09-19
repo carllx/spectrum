@@ -36,9 +36,9 @@ from scipy.ndimage.filters import gaussian_filter
 # min_silence_len = 640 # interge
 # sigma= 3
 
-# wavflie = '2_雨宝咒.mp3' #60句 
-# min_silence_len = 640 # interge
-# sigma= 4
+wavflie = '2_雨宝咒.mp3' #60句 
+min_silence_len = 640 # interge
+sigma= 4
 
 
 # wavflie = '4_清心普善咒.mp3' #129句 
@@ -54,12 +54,10 @@ from scipy.ndimage.filters import gaussian_filter
 # sigma= 4.5
 
 
-wavflie = '2、消灾吉祥神咒.mp3' #7段 # 一个区域太高
-min_silence_len = 640 # interge
-sigma= 5
+# wavflie = '2、消灾吉祥神咒.mp3' #7段 # 一个区域太高
+# min_silence_len = 640 # interge
+# sigma= 5
 
-# wavflie = '3、功德宝山神咒.mp3'
-# min_silence_len = 79 # interge
 
 
 
@@ -176,12 +174,23 @@ print(outTXT,'is outputed')
 #%%
 # Show图形 108张截面 plot
 # ---------
+outSVG = r'%s%s_sp%d.svg'%(exports,name,len_rows)
 fig = plt.figure(figsize=(5,len(RMS)))
 spec = gridspec.GridSpec(ncols=1, nrows=len(RMS))
 for i, chunk in enumerate(RMS):
     ax = fig.add_subplot(spec[i])
-    ax.plot(chunk) # plot.pcolormesh(t, f, dBS),
+    ax.plot(chunk) # plot.pcolormesh(t, f, dBS)
+plt.savefig(outSVG,transparent=True) 
 
+# RMSG = RMSG[1:-1].copy()
+outSVG = r'%s%s_sp%d_G.svg'%(exports,name,len_rows)
+RMSG = RMSG[1::2].copy()
+fig = plt.figure(figsize=(5,len(RMSG)))
+spec = gridspec.GridSpec(ncols=1, nrows=len(RMSG))
+for i, chunk in enumerate(RMSG):
+    ax = fig.add_subplot(spec[i])
+    ax.plot(chunk) # plot.pcolormesh(t, f, dBS),
+plt.savefig(outSVG,transparent=True) # dpi=300
 #%%
 # specgram
 # ---------

@@ -102,7 +102,7 @@ for i, fname in enumerate(fnames):
     bpy.ops.mesh.normals_make_consistent(inside=False)
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
-
+    
 
     # # rendering
     # #------------------------
@@ -134,3 +134,36 @@ for i, fname in enumerate(fnames):
     objs = bpy.data.objects
     objs.remove(o_mesh, do_unlink=True)
     objs.remove(o_render, do_unlink=True)
+    
+    ## export
+    o_plane.select_set(True)
+    bpy.data.objects['Text'].select_set(True)
+    target_file = '%s/%s-s%d.obj'%(export_path,name,slice_num )
+    bpy.ops.export_scene.obj(
+        filepath=target_file,
+        check_existing=True,
+        axis_forward='-Z',
+        axis_up='Y',
+        filter_glob="*.obj;*.mtl",
+        use_selection=True,
+        use_animation=False,
+        use_mesh_modifiers=True,
+        use_edges=True,
+        use_smooth_groups=False,
+        use_smooth_groups_bitflags=False,
+        use_normals=True,
+        use_uvs=True,
+        use_materials=True,
+        use_triangles=False,
+        use_nurbs=False,
+        use_vertex_groups=False,
+        use_blen_objects=True,
+        group_by_object=False,
+        group_by_material=False,
+        keep_vertex_order=False,
+        global_scale=1,
+        path_mode='AUTO'
+     )
+    o_plane.select_set(False)
+    bpy.data.objects['Text'].select_set(False)
+

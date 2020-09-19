@@ -1,3 +1,5 @@
+# Terminal 启动  /Applications/Blender.app/Contents/MacOS/Blender
+# 
 # 科普 - 振幅/响度/音量/增益 大乱斗 https://zhuanlan.zhihu.com/p/38439252
 # Read the wav file (mono)conda install -c conda-forge librosa
 # 截取 https://stackoverflow.com/questions/53797199/perform-fft-for-every-second-on-wav-file-with-python
