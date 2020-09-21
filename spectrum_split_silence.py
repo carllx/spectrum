@@ -16,11 +16,8 @@ from scipy.interpolate import make_interp_spline, BSpline
 from scipy.ndimage.filters import gaussian_filter
 
 
-#%% [markdown]
-# ## 调试配置参数
-
-
 #%%
+# ## 调试配置参数
 # 调试一下静音参数达到最终输出音频段数 例如:108 段音频
 
 # wavflie = '1_般若波罗蜜多咒.mp3' #38句 
